@@ -1,0 +1,46 @@
+Wrapping it up in an Email Service
+To encapsulate the email sending functionality and make it easy to send email from anywhere in your ASP.NET Core application you can create an EmailService class and IEmailService interface like below.
+
+For examples of how this email service is used in a real project see ASP.NET Core 3.1 - Boilerplate API with Email Sign Up, Verification, Authentication & Forgot Password.
+
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Options;
+using MimeKit;
+using MimeKit.Text;
+using WebApi.Helpers;
+
+namespace WebApi.Services
+{
+    public interface IEmailService
+    {
+        void Send(string from, string to, string subject, string html);
+    }
+
+    public class EmailService : IEmailService
+    {
+        private readonly AppSettings _appSettings;
+
+        public EmailService(IOptions<AppSettings> appSettings)
+        {
+            _appSettings = appSettings.Value;
+        }
+
+        public void Send(string from, string to, string subject, string html)
+        {
+            // create message
+            var email = new MimeMessage();
+            email.From.Add(MailboxAddress.Parse(from));
+            email.To.Add(MailboxAddress.Parse(to));
+            email.Subject = subject;
+            email.Body = new TextPart(TextFormat.Html) { Text = html };
+
+            // send email
+            using var smtp = new SmtpClient();
+            smtp.Connect(_appSettings.SmtpHost, _appSettings.SmtpPort, SecureSocketOptions.StartTls);
+            smtp.Authenticate(_appSettings.SmtpUser, _appSettings.SmtpPass);
+            smtp.Send(email);
+            smtp.Disconnect(true);
+        }
+    }
+}
