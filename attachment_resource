@@ -1,0 +1,33 @@
+var message = new MimeMessage();
+            message.To.Add(new MailboxAddress("xxxx@126.com", "xxxx@126.com"));//收件人
+            message.From.Add(new MailboxAddress("xxxx", "xxxx@163.com"));//发件人
+            message.Subject = "邮件测试主题2";
+
+            var builder = new BodyBuilder();
+            var image = builder.LinkedResources.Add(path);
+            image.ContentId = MimeUtils.GenerateMessageId();
+
+            builder.TextBody = string.Format(@"[cid:{0}] Hey AnLong", image.ContentId);
+            builder.HtmlBody = string.Format(@"<p>Hey anlong</p><p>Will you be my +1</p><center><img src=""cid:{0}""></center>", image.ContentId);
+
+            // We may also want to attach a calendar event for Monica's party...
+            builder.Attachments.Add(@"C:\Users\Joey\Documents\party.ics");
+
+            message.Body = builder.ToMessageBody();
+
+
+
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                client.Connect("smtp.163.com", 465, true);
+
+                // Note: since we don't have an OAuth2 token, disable
+                // the XOAUTH2 authentication mechanism.
+                client.AuthenticationMechanisms.Remove("XOAUTH2");
+
+                // Note: only needed if the SMTP server requires authentication
+                client.Authenticate("xxxx@163.com", "123456");
+
+                client.Send(message);
+                client.Disconnect(true);
+            }
