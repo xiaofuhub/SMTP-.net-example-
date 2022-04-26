@@ -1,0 +1,54 @@
+public bool SendEmailToSingle(string toEmail, string Subject, string FormatId)
+        {
+            try
+            {
+                var message = new MimeMessage();
+                message.To.Add(new MailboxAddress(toEmail));
+                message.From.Add(new MailboxAddress(EmailDisplayName, EmailUserName));
+                message.Subject = Subject;
+
+                // 获取邮件模板
+                string FullFormatPath = Path.Combine(Environment.CurrentDirectory, "Content", FormatId);
+                string[] ImgPaths = Directory.GetFiles(Path.Combine(FullFormatPath, "Resources"));
+
+                string HtmlFormat = string.Empty;
+
+                var builder = new BodyBuilder();
+
+                using (FileStream fs = new FileStream(Path.Combine(FullFormatPath, "format.htm"), FileMode.Open))
+                {
+                    using (StreamReader sr = new StreamReader(fs, Encoding.GetEncoding("gbk")))
+                    {
+                        HtmlFormat = sr.ReadToEnd();
+                    }
+                }
+
+                // 将图片加入内嵌资源，并更换邮件中的图片的链接
+                foreach (string imgpath in ImgPaths)
+                {
+                    var image = builder.LinkedResources.Add(imgpath);
+                    image.ContentId = MimeUtils.GenerateMessageId();
+                    HtmlFormat = HtmlFormat.Replace(Path.GetFileName(imgpath), string.Format("cid:{0}", image.ContentId));
+                }
+
+                builder.HtmlBody = HtmlFormat;
+
+                message.Body = builder.ToMessageBody();
+
+                //return message;
+                using (SmtpClient client = new SmtpClient())
+                {
+                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+                    client.Connect(EmailServerAddress, EmailServerPort, false);
+                    client.Authenticate(EmailUserName, EmailPassword);
+                    client.Send(message);
+                    client.Disconnect(true);
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
