@@ -1,0 +1,59 @@
+integer li_rc
+oleobject loo_Ftp
+integer li_Success
+string ls_LocalFilename
+string ls_RemoteFilename
+
+// This example requires the Chilkat API to have been previously unlocked.
+// See Global Unlock Sample for sample code.
+
+loo_Ftp = create oleobject
+li_rc = loo_Ftp.ConnectToNewObject("Chilkat_9_5_0.Ftp2")
+if li_rc < 0 then
+    destroy loo_Ftp
+    MessageBox("Error","Connecting to COM object failed")
+    return
+end if
+
+loo_Ftp.Hostname = "ftp.example.com"
+loo_Ftp.Username = "login"
+loo_Ftp.Password = "password"
+
+// Use passive mode:
+loo_Ftp.Passive = 1
+
+// Connect and login to the FTP server.
+li_Success = loo_Ftp.Connect()
+if li_Success <> 1 then
+    Write-Debug loo_Ftp.LastErrorText
+    destroy loo_Ftp
+    return
+end if
+
+// Change to the remote directory where the file is located.
+// This step is only necessary if the file is not in the root directory
+// for the FTP account.
+li_Success = loo_Ftp.ChangeRemoteDir("junk")
+if li_Success <> 1 then
+    Write-Debug loo_Ftp.LastErrorText
+    destroy loo_Ftp
+    return
+end if
+
+// Download a file.
+ls_LocalFilename = "hamlet.xml"
+ls_RemoteFilename = "hamlet.xml"
+
+li_Success = loo_Ftp.GetFile(ls_RemoteFilename,ls_LocalFilename)
+if li_Success <> 1 then
+    Write-Debug loo_Ftp.LastErrorText
+    destroy loo_Ftp
+    return
+end if
+
+li_Success = loo_Ftp.Disconnect()
+
+Write-Debug "File Downloaded!"
+
+
+destroy loo_Ftp
