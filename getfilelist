@@ -1,0 +1,82 @@
+integer li_rc
+oleobject loo_Ftp
+integer li_Success
+integer li_DirExists
+integer i
+integer n
+integer li_IsDir
+string ls_Fname
+
+// This example requires the Chilkat API to have been previously unlocked.
+// See Global Unlock Sample for sample code.
+
+loo_Ftp = create oleobject
+li_rc = loo_Ftp.ConnectToNewObject("Chilkat_9_5_0.Ftp2")
+if li_rc < 0 then
+    destroy loo_Ftp
+    MessageBox("Error","Connecting to COM object failed")
+    return
+end if
+
+loo_Ftp.Hostname = "ftp.example.com"
+loo_Ftp.Username = "login"
+loo_Ftp.Password = "password"
+
+// Connect and login to the FTP server.
+li_Success = loo_Ftp.Connect()
+if li_Success <> 1 then
+    Write-Debug loo_Ftp.LastErrorText
+    destroy loo_Ftp
+    return
+end if
+
+// Does the "temp" directory exist?
+
+li_DirExists = loo_Ftp.ChangeRemoteDir("/temp")
+if li_DirExists = 1 then
+    Write-Debug "Yes, the temp directory exists."
+    //  Yes, it exists. Restore the current remote dir:
+    li_Success = loo_Ftp.ChangeRemoteDir("..")
+    if li_Success <> 1 then
+        Write-Debug loo_Ftp.LastErrorText
+        destroy loo_Ftp
+        return
+    end if
+
+end if
+
+// Alternatively, you may set the ListPattern = "*" and 
+//  look for the directory:
+loo_Ftp.ListPattern = "*"
+
+n = loo_Ftp.GetDirCount()
+if n < 0 then
+    // Failed to get directory listing based on ListPattern
+    Write-Debug loo_Ftp.LastErrorText
+    destroy loo_Ftp
+    return
+end if
+
+if n > 0 then
+    for i = 0 to n - 1
+
+        li_IsDir = loo_Ftp.GetIsDirectory(i)
+        if li_IsDir = 1 then
+
+            ls_Fname = loo_Ftp.GetFilename(i)
+            if ls_Fname = "temp" then
+                Write-Debug "Found temp directory!"
+                li_Success = loo_Ftp.Disconnect()
+                destroy loo_Ftp
+                return
+            end if
+
+        end if
+
+    next
+end if
+
+li_Success = loo_Ftp.Disconnect()
+
+
+destroy loo_Ftp
