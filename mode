@@ -5,7 +5,7 @@ mode=2: Download newer or non-existant files.
 mode=3: Download only newer files. If a file does not already exist on the local filesystem, it is not downloaded from the server..
 mode=5: Download only missing files or files with size differences.
 mode=6: Same as mode 5, but also download newer files.
-mode=99: Do not download files, but instead delete remote files that do not exist locally.
+mode=7: Do not download files, but instead delete remote files that do not exist locally.
 
 /**************************upload****************************************************/
 mode=0: Upload all files
