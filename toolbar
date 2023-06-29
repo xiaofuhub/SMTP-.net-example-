@@ -1,0 +1,37 @@
+TBBUTTON tbButtons[] = {
+    { 0, IDM_NEW, TBSTATE_ENABLED, TBSTYLE_BUTTON, { 0 }, 0, 0 },
+    { 1, IDM_OPEN, TBSTATE_ENABLED, TBSTYLE_BUTTON, { 0 }, 0, 0 },
+    { 2, 0, TBSTATE_ENABLED, TBSTYLE_BUTTON | TBSTYLE_DROPDOWN, { 0 }, 0, 0 },
+    { 3, IDM_SAVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, { 0 }, 0, 0 },
+    { 4, 0, TBSTATE_ENABLED, TBSTYLE_SEP, { 0 }, 0, 0 },
+    { 5, IDM_HELP, TBSTATE_ENABLED, TBSTYLE_BUTTON, { 0 }, 0, 0 }
+};
+
+TBBUTTONINFO tbbi = { sizeof(TBBUTTONINFO) };
+tbbi.dwMask = TBIF_STYLE | TBIF_STATE;
+tbbi.fsStyle = TBSTYLE_BUTTON | TBSTYLE_DROPDOWN;
+tbbi.fsState = TBSTATE_ENABLED;
+SendMessage(hwndToolbar, TB_SETBUTTONINFO, IDM_DROPDOWN, (LPARAM)&tbbi);
+
+HMENU hMenu = CreatePopupMenu();
+InsertMenu(hMenu, 0, MF_BYPOSITION | MF_STRING, IDM_MENUITEM1, TEXT("菜单项1"));
+InsertMenu(hMenu, 1, MF_BYPOSITION | MF_STRING, IDM_MENUITEM2, TEXT("菜单项2"));
+
+MENUINFO mi = { sizeof(MENUINFO) };
+mi.fMask = MIM_STYLE;
+mi.dwStyle = MNS_AUTODISMISS | MNS_MODELESS;
+SetMenuInfo(hMenu, &mi);
+
+MENUITEMINFO mii = { sizeof(MENUITEMINFO) };
+mii.fMask = MIIM_SUBMENU | MIIM_STRING;
+mii.hSubMenu = hMenu;
+mii.dwTypeData = TEXT("下拉菜单");
+mii.cch = lstrlen(mii.dwTypeData);
+
+InsertMenuItem(hMenu, 0, TRUE, &mii);
+
+tbButtons[2].dwData = (DWORD_PTR)hMenu;
+tbButtons[2].fsState |= TBSTATE_ENABLED;
+tbButtons[2].fsStyle |= TBSTYLE_DROPDOWN;
+
+SendMessage(hwndToolbar, TB_ADDBUTTONS, sizeof(tbButtons)/sizeof(TBBUTTON), (LPARAM)&tbButtons);
