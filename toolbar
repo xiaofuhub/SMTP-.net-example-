@@ -35,3 +35,28 @@ tbButtons[2].fsState |= TBSTATE_ENABLED;
 tbButtons[2].fsStyle |= TBSTYLE_DROPDOWN;
 
 SendMessage(hwndToolbar, TB_ADDBUTTONS, sizeof(tbButtons)/sizeof(TBBUTTON), (LPARAM)&tbButtons);
+----------------------------------------------------------------------------------------------------------------------------
+
+// 创建下拉菜单
+HMENU hPopupMenu = CreatePopupMenu();
+AppendMenu(hPopupMenu, MF_STRING, ID_MENUITEM1, L"Menu Item 1");
+AppendMenu(hPopupMenu, MF_STRING, ID_MENUITEM2, L"Menu Item 2");
+
+// 将下拉菜单关联到工具栏按钮
+TBBUTTONINFO tbButtonInfo;
+ZeroMemory(&tbButtonInfo, sizeof(tbButtonInfo));
+tbButtonInfo.cbSize = sizeof(tbButtonInfo);
+tbButtonInfo.dwMask = TBIF_STYLE;
+SendMessage(hWndToolbar, TB_GETBUTTONINFO, ID_BUTTON2, (LPARAM)&tbButtonInfo);
+tbButtonInfo.fsStyle |= TBSTYLE_DROPDOWN;
+SendMessage(hWndToolbar, TB_SETBUTTONINFO, ID_BUTTON2, (LPARAM)&tbButtonInfo);
+SendMessage(hWndToolbar, TB_SETDROPDOWNSTATE, TRUE, 0);
+SendMessage(hWndToolbar, TB_SETDROPDOWNGAP, 0, 0);
+SendMessage(hWndToolbar, TB_SETPARENT, (WPARAM)hWndParent, 0);
+SendMessage(hWndToolbar, TB_SETWINDOWTHEME, 0, (LPARAM)L"Explorer");
+
+// 显示下拉菜单
+RECT rect;
+SendMessage(hWndToolbar, TB_GETRECT, ID_BUTTON2, (LPARAM)&rect);
+ClientToScreen(hWndToolbar, (LPPOINT)&rect.left。
+
