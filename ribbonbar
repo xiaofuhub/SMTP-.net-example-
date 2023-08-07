@@ -1,0 +1,40 @@
+    // 循环查找每个 Category
+    FOR i = 1 TO li_categoryCount
+        // 获取 Category 的引用
+        category = ribbonbar.GetCategory(i)
+
+        IF IsValid(category) THEN
+            // 获取 Category 的文本
+            String ls_categoryText
+            ls_categoryText = category.Text
+
+            // 获取 Panel 数量
+            li_panelCount = category.GetPanelCount()
+
+            // 循环查找每个 Panel
+            FOR j = 1 TO li_panelCount
+                // 获取 Panel 的引用
+                panel = category.GetPanel(j)
+
+                IF IsValid(panel) THEN
+                    // 获取 Panel 的文本
+                    String ls_panelText
+                    ls_panelText = panel.Text
+
+                    // 获取 Panel 的句柄
+                    panelHandle = Handle(panel)
+
+                    IF panelHandle > 0 THEN
+                        // 查找 SmallButton 对象
+                        smallButton = ribbonbar.ObjectFromHandle(panelHandle, "RibbonSmallButton")
+
+                        IF IsValid(smallButton) THEN
+                            // 对 SmallButton 进行操作
+                            MessageBox("SmallButton Text", smallButton.Text)
+                        END IF
+                    END IF
+                END IF
+            NEXT
+        END IF
+    NEXT
+End Event
