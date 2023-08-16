@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <curl/curl.h>
+
+int main(void)
+{
+    CURL *curl;
+    CURLcode res;
+
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+
+    curl = curl_easy_init();
+    if(curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, "ftps://example.com/");
+
+        /* 设置代理 */
+        curl_easy_setopt(curl, CURLOPT_PROXY, "http://proxy.example.com:1080");
+        curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+
+        /* 启用FTP目录列表 */
+        curl_easy_setopt(curl, CURLOPT_DIRLISTONLY, 1L);
+
+        /* 打开verbose模式，用于调试和检查libcurl的行为 */
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+        /* 如果您的FTP服务器需要身份验证 */
+        curl_easy_setopt(curl, CURLOPT_USERNAME, "user");
+        curl_easy_setopt(curl, CURLOPT_PASSWORD, "pass");
+
+        /* 执行请求，res将获取返回代码 */
+        res = curl_easy_perform(curl);
+
+        /* 检查错误 */
+        if(res != CURLE_OK)
+            fprintf(stderr, "curl_easy_perform() failed: %s\n",
+                curl_easy_strerror(res));
+
+        /* 总是清理 */
+        curl_easy_cleanup(curl);
+    }
+
+    curl_global_cleanup();
+
+    return 0;
+}
