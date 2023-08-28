@@ -1,0 +1,13 @@
+std::string getCurrentDateRFC5322() {
+    std::time_t now = std::time(nullptr);
+    char buffer[128];
+    std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %z", std::localtime(&now));
+    return std::string(buffer);
+}
+
+        // 获取当前时间并设置为日期字段
+        std::string currentDate = getCurrentDateRFC5322();
+        std::string dateHeader = "Date: " + currentDate;
+        struct curl_slist* headers = nullptr;
+        headers = curl_slist_append(headers, dateHeader.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
